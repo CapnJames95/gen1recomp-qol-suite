@@ -1,0 +1,7 @@
+return {
+  summary = "Free L/R from native Help and L=A without consuming their input.",
+  tags = { "qol", "gen3", "controls" },
+  differences = { changed = { "Disable native Help and L=A" }, added = {}, known = { "Does not resolve other mods' hotkey conflicts" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "Engine and mod API" } },
+  compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}

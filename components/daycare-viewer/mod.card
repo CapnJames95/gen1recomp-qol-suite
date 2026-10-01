@@ -1,0 +1,14 @@
+return {
+  summary = "Inspect, manage and travel to both FR/LG Day Cares from START.",
+  tags = { "tool", "gen3", "daycare" },
+  differences = {
+    changed = {},
+    added = { "DAY CARE start-menu viewer", "Training and move previews", "Breeding compatibility, egg status and party hatch progress", "Native deposit/withdraw controls and daycare teleports" },
+    known = { "Collect pending eggs in person before changing Four Island parents", "Internal FR/LG APIs required" },
+  },
+  credits = {
+    { who = "BOIS CLUB GAMES, LLC", for_ = "Based on the Pokemon Gen 1 Recompilation Project" },
+    { who = "Auto Breeder / LegalMon", for_ = "Native menu visual conventions" },
+  },
+  compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}

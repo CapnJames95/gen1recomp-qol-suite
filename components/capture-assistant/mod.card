@@ -1,0 +1,7 @@
+return {
+ summary = "Compare owned balls, native catch estimates and moveset risks during wild single battles.",
+ tags = { "tool", "gen3", "qol" },
+ differences = { changed = {}, added = { "Capture Assistant" }, known = { "Requires FR/LG engine internals" } },
+ credits = { { who = "BOIS CLUB GAMES, LLC", for_ = "Based on the Pokemon Gen 1 Recompilation Project" }, { who = "Collection mods", for_ = "Native FRLG menu style" } },
+ compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}

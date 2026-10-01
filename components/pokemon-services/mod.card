@@ -1,0 +1,7 @@
+return {
+ summary = "Open native Pokemon services from the Mods menu or START > SERVICES.",
+ tags = { "tool", "gen3", "qol" },
+ differences = { changed = {}, added = { "Pokemon Services" }, known = { "Remote access bypasses travel; native costs and restrictions apply." } },
+ credits = { { who = "BOIS CLUB GAMES, LLC", for_ = "Based on the Pokemon Gen 1 Recompilation Project" }, { who = "Collection mods", for_ = "Native FRLG menu style" } },
+ compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}

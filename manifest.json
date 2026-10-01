@@ -1,0 +1,52 @@
+{
+  "id": "frlg-qol-suite",
+  "name": "QoL Suite",
+  "version": "0.3.10",
+  "api": 2,
+  "entry": "main.lua",
+  "games": [
+    "gen3"
+  ],
+  "profile": "overhaul",
+  "category": "TOOL",
+  "permissions": [
+    "engine_internals"
+  ],
+  "description": "32 QoL components: 31 applicable tools per game, including eight Emerald companions in Hoenn Tools.",
+  "conflicts": [
+    "capture-assistant",
+    "daycare-viewer",
+    "disable-lr-help",
+    "fly-teleport",
+    "frlg_qol_auto_surf",
+    "frlg_qol_bag_sort",
+    "frlg_qol_ball_shortcut",
+    "frlg_qol_battle_pacing",
+    "frlg_qol_berry_restock",
+    "frlg_qol_dex_companion",
+    "frlg_qol_fast_healing",
+    "frlg_qol_hm_field_kit",
+    "frlg_qol_hoenn_tools",
+    "frlg_qol_hold_fast_forward",
+    "frlg_qol_instant_text",
+    "frlg_qol_key_item_help",
+    "frlg_qol_map_services",
+    "frlg_qol_party_items",
+    "frlg_qol_party_nickname",
+    "frlg_qol_party_reminder",
+    "frlg_qol_quick_save_prompt",
+    "frlg_qol_quiet_exp",
+    "frlg_qol_repel_reuse",
+    "frlg_qol_reusable_tms",
+    "frlg_qol_running_start",
+    "frlg_qol_shop_count",
+    "frlg_qol_summary_info",
+    "frlg_qol_vs_seeker_status",
+    "frlg_scrollable_start",
+    "pokemon-services",
+    "quick-heal-party",
+    "summary-ivs"
+  ],
+  "game_version": ">=0.3.39 <0.4.0",
+  "github": "CapnJames95/gen1recomp-qol-suite"
+}

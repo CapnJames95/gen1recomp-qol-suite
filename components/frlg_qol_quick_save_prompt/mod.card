@@ -1,0 +1,8 @@
+return {
+  summary = "Remove the redundant second confirmation from the normal Save menu.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Remove the redundant second confirmation from the normal Save menu." }, added = {}, known = { "Not ROM-playtested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

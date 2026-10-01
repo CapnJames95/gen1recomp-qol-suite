@@ -1,0 +1,5 @@
+return { summary = "Press A to use Surf, Cut, Strength, Rock Smash or Waterfall without confirmation.", author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Quick Field Actions replaces Auto Surf; adds Cut, Strength, Rock Smash and Waterfall." }, added = {}, known = { "Not device-playtested" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 }, }

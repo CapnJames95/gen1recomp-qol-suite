@@ -1,0 +1,8 @@
+return {
+  summary = "Rename non-Egg Pokemon from the party list, regardless of original trainer.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Rename non-Egg Pokemon from the party list, regardless of original trainer." }, added = {}, known = { "Not ROM-playtested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

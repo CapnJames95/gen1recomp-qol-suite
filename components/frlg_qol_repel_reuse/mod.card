@@ -1,0 +1,8 @@
+return {
+  summary = "Offer another owned Repel after the existing wear-off message.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Offer another owned Repel after the existing wear-off message." }, added = {}, known = { "Not ROM-playtested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

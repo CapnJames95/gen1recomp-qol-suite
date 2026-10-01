@@ -1,0 +1,8 @@
+return {
+  summary = "Open the move reminder from the party list with the original FRLG mushroom payment.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Open the move reminder from the party list with the original FRLG mushroom payment." }, added = {}, known = { "Not ROM-playtested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

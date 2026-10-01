@@ -1,0 +1,8 @@
+return {
+  summary = "Replace a berry actually consumed in battle using one matching berry from your Bag.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Replace a berry actually consumed in battle using one matching berry from your Bag." }, added = {}, known = { "Not ROM-playtested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

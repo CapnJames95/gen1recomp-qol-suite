@@ -1,0 +1,8 @@
+return {
+  summary = "Configurable keyboard/controller shortcut for a LegalMon-style Throw or Select Ball menu.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Choose Throw or Select Ball; no instant throw on opening." }, added = { "Configurable keyboard/controller shortcut, owned counts and session selection memory" }, known = { "Not ROM-playtested or controller-hardware tested; uses FRLG internals" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

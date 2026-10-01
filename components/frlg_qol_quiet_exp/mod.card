@@ -1,0 +1,6 @@
+return {
+  summary = "Skip EXP announcements, keep level-ups and move learning.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

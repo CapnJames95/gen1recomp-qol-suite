@@ -1,0 +1,7 @@
+return {
+  summary = 'Teleport to Fly destinations unlocked by game progression, or optionally unlock all 20.',
+  tags = {'tool', 'gen3', 'travel'},
+  differences = {changed={}, added={'TELEPORT destination menu', 'Optional Dual Screen Home tile'}, known={'Game progression is the default; all-unlocked mode bypasses destination locks'}},
+  credits = {{who='BOIS CLUB GAMES, LLC', for_='Based on the Pokemon Gen 1 Recompilation Project'}, {who='Collection mods', for_='Native FRLG menu style and travel checks'}},
+  compat = {engine='>=0.3.21 <0.4.0', modApi=2},
+}

@@ -1,0 +1,5 @@
+return { summary = "Explain useful key items after acquisition and in Bag descriptions.", author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "experimental" },
+  differences = { changed = { "Explain useful key items after acquisition and in Bag descriptions." }, added = {}, known = { "Not ROM-playtested" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 }, }

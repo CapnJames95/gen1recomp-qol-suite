@@ -1,0 +1,8 @@
+return {
+  summary = "Owned HMs and Sweet Scent without teaching; native field rules apply.",
+  author = "Codex (AI-assisted)",
+  tags = { "qol", "firered", "leafgreen", "emerald", "experimental" },
+  differences = { changed = { "Owned HMs and Sweet Scent without teaching; native field rules apply." }, added = { "Sweet Scent needs engine 0.3.42+. Rod fishing and optional cave lighting." }, known = { "Automated three-game checks; manual gameplay testing remains incomplete" } },
+  credits = { { who = "bryanthaboi/gen1recomp", for_ = "engine and mod API" } },
+  compat = { engine = ">=0.0.0-0 <2.0.0", modApi = 2 },
+}

@@ -1,0 +1,7 @@
+return {
+  summary = "Inline summary IVs and a quiet I/X wild Pokemon inspector with IV/EV toggle.",
+  tags = { "ui", "gen3", "qol" },
+  differences = { changed = {}, added = { "Inline summary IVs" }, known = { "Dual Screen requires 0.3.13+" } },
+  credits = { { who = "Collection mods", for_ = "Native FRLG menu style" } },
+  compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}
