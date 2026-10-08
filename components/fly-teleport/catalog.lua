@@ -17,7 +17,9 @@ for _, name in ipairs({'LITTLEROOT_TOWN','OLDALE_TOWN','PETALBURG_CITY','RUSTBOR
   hoenn[#hoenn+1]={name,name:gsub('_',' ')}
 end
 local function activeNames()
- return require('src.core.GameVersion').get()=='emerald' and hoenn or names
+ local version=require('src.core.GameVersion').get()
+ if version=='ruby' or version=='sapphire' then local rows={};for _,r in ipairs(hoenn)do if r[1]~='BATTLE_FRONTIER' then rows[#rows+1]=r end end;return rows end
+ return version=='emerald' and hoenn or names
 end
 local flagOverrides = {
   INDIGO_PLATEAU='INDIGO_PLATEAU_EXTERIOR',
@@ -32,7 +34,7 @@ function Catalog.unlocked(session, section, allUnlocked)
   if not key or not session then return false end
   if allUnlocked then return true end
   local Flags=require('src.core.game3.scripting.flags')
-  local flag=session.version=='emerald' and (key=='BATTLE_FRONTIER' and 'FLAG_LANDMARK_BATTLE_FRONTIER' or 'FLAG_VISITED_'..key) or 'FLAG_WORLD_MAP_'..(flagOverrides[key] or key)
+  local flag=require('src.core.game3.profile').forSession(session).family=='rse' and (key=='BATTLE_FRONTIER' and 'FLAG_LANDMARK_BATTLE_FRONTIER' or 'FLAG_VISITED_'..key) or 'FLAG_WORLD_MAP_'..(flagOverrides[key] or key)
   -- Flags.getFlag's string aliases are FRLG-only; Emerald must resolve its
   -- own numeric constant before reading either the save or the live store.
   flag=require('src.core.game3.constants').of(session.version):flag(flag)
@@ -57,7 +59,7 @@ function Catalog.destination(section)
   local ok,dest
   if require('src.core.GameVersion').get()=='emerald' then
     local session=require('src.core.game3.runtime').getSession()
-    local C=require('src.core.game3.constants').of('emerald')
+    local C=require('src.core.game3.constants').active()
     local sec=C:require('region_map_sections',section)
     local R=require('src.ui.game3.rse.region_map')
     ok,dest=pcall(function()

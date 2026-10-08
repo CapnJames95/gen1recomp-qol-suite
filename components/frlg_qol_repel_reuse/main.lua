@@ -20,13 +20,12 @@ return function(mod)
     end
   end
   api.wrap(Steps, "onRepelStep", function(previous, session, game)
-    local repelVar = 0x4020
-    if session.version == "emerald" then
-      repelVar = require("src.core.game3.constants").of("emerald"):require("vars", "VAR_REPEL_STEP_COUNT")
-    end
-    local expires = tonumber(session.repelSteps or (session.vars or {})[repelVar]) == 1
+    local Sem = require("src.core.game3.field_semantics")
+    local expires = tonumber(Sem.getVar(session, "repelSteps")) == 1
     previous(session, game)
-    if expires and candidate(session) then
+    -- The engine may decline to tick Repel in a facility. Only prompt after
+    -- the native counter actually expires, using the same source of truth.
+    if expires and tonumber(Sem.getVar(session, "repelSteps")) == 0 and candidate(session) then
       Steps.queueEvent({ run = function(onDone)
         local id = candidate(session)
         if not id or not api.active() then onDone() return end

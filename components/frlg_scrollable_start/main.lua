@@ -12,7 +12,7 @@ return function(mod)
   local function active()
     local version = Version.get()
     return Runtime.events == owner and mod.options:get('enabled') ~= false
-      and (version == 'firered' or version == 'leafgreen' or version == 'emerald')
+      and (version == 'firered' or version == 'leafgreen' or version == 'emerald' or version == 'ruby' or version == 'sapphire')
   end
   local function module(name)
     return assert(load(assert(mod:read(name..'.lua')), '@frlg_scrollable_start/'..name..'.lua'))()

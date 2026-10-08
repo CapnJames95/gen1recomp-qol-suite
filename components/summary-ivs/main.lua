@@ -1,3 +1,7 @@
+local function collectionSmall()
+ local v=require('src.core.GameVersion').get()
+ return v~='ruby' and v~='sapphire'
+end
 return function(mod)
   local Summary = require('src.ui.game3.summary_menu')
   local Font = require('src.ui.game3.frlg_font')
@@ -23,11 +27,12 @@ return function(mod)
 
   local function current()
     local session = Runtime.getSession()
+    local S=Summary._nativeDelegate or Summary
     if owner ~= Mods.events or mod.options:get('enabled') == false or not session
-      or (session.version ~= 'firered' and session.version ~= 'leafgreen' and session.version ~= 'emerald')
-      or not Summary.open or (Summary._enemyParty and not inspect()) or Summary._mode == 'select_move'
-      or (Summary._playerState and Summary._playerState ~= session and not inspect()) then return nil end
-    local mon = Summary._party and Summary._party[Summary._cursor]
+      or (session.version ~= 'firered' and session.version ~= 'leafgreen' and session.version ~= 'emerald' and session.version ~= 'ruby' and session.version ~= 'sapphire')
+      or not S.open or ((S._enemyParty or (S._opts and S._opts.enemyParty)) and not inspect()) or S._mode == 'select_move' or S._mode==2 or S._mode==3
+      or (S._playerState and S._playerState ~= session and not inspect()) then return nil end
+    local mon = S._party and S._party[S._cursor]
     if type(mon) ~= 'table' or Pokemon.isEgg(mon) then return nil end
     return mon
   end
@@ -59,8 +64,8 @@ return function(mod)
       record.drawing = false
       if not ok then error(result, 0) end
       local session=Runtime.getSession()
-      for _, row in ipairs(session and session.version=='emerald' and {} or record.rows()) do
-        Font.draw(row.text, row.x, row.y, {small=true, colors=Font.COLOR.NORMAL})
+      for _, row in ipairs(session and require('src.core.game3.profile').forSession(session).family=='rse' and {} or record.rows()) do
+        Font.draw(row.text, row.x, row.y, {small=collectionSmall(), colors=Font.COLOR.NORMAL})
       end
       return result
     end

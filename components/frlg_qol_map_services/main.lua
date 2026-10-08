@@ -23,7 +23,7 @@ return function(mod)
     MAPSEC_SIX_ISLAND = { "Pokemon Center / Mart" },
     MAPSEC_SEVEN_ISLAND = { "Pokemon Center / Mart" },
   }
-  if require("src.core.GameVersion").get()=="emerald" then
+  if require("src.core.game3.profile").active().family=="rse" then
     services={
       MAPSEC_LITTLEROOT_TOWN={"Birch's Lab / Home healing"},
       MAPSEC_OLDALE_TOWN={"Pokemon Center / Mart"},
@@ -45,11 +45,27 @@ return function(mod)
       MAPSEC_BATTLE_FRONTIER={"Battle facilities / BP tutors"},
     }
   end
-  local emerald=require("src.core.GameVersion").get()=="emerald"
+  local rs=require('src.core.GameVersion').get()=='ruby' or require('src.core.GameVersion').get()=='sapphire'
+  if rs then
+    services.MAPSEC_VERDANTURF_TOWN={"Pokemon Center / Mart / Normal Rank Contest"}
+    services.MAPSEC_FALLARBOR_TOWN={"Pokemon Center / Mart / Super Rank Contest", "Move Reminder: Heart Scale"}
+    services.MAPSEC_SLATEPORT_CITY={"Pokemon Center / Mart / Market", "Name Rater / Harbor / Hyper Rank Contest"}
+    services.MAPSEC_LILYCOVE_CITY={"Pokemon Center / Department Store", "Move Deleter / Master Rank Contest / Harbor"}
+    services.MAPSEC_BATTLE_FRONTIER=nil
+    services.MAPSEC_BATTLE_TOWER={"Battle Tower: Level 50 / Level 100"}
+  end
+  local emerald=require("src.core.game3.profile").active().family=="rse"
+  local function navMap()
+    if not rs then return end
+    local nav=require('src.ui.game3.rs.pokenav.init').active()
+    if nav and nav.menu=='map' and nav.phase=='active' and (nav.busy or 0)==0 then return nav.feature end
+  end
   local function section()
     if not emerald then return Map.currentMapSec() end
+    local nav=navMap()
+    if nav then return require('src.core.game3.constants').active():name('region_map_sections',nav.section,'MAPSEC_') end
     local state=require("src.ui.game3.rse.region_map").active()
-    return state and require("src.core.game3.constants").of("emerald"):name("region_map_sections",state.mapSecId,"MAPSEC_")
+    return state and require("src.core.game3.constants").active():name("region_map_sections",state.mapSecId,"MAPSEC_")
   end
   local function rowsFor()
     local rows = {}
@@ -73,12 +89,24 @@ return function(mod)
   mod.exports.show = function()
     if not api.active() then return false end
     local Stack=require('src.ui.game3.stack');local top=Stack.top()
+    local nav=navMap()
+    if top and top.id=='rs_pokenav' and nav and not nav.zoomFrame and nav.moveFrames==0 then
+      api.menu(nav.name or 'HOENN MAP',rowsFor());return true
+    end
     if not top or (top.id~='region_map' and top.id~='rse_region_map') then return false end
     local R=emerald and require('src.ui.game3.rse.region_map');local state=R and R.active()
     if emerald and (not state or state.inputFn=='move')then return false end
     if not emerald and (not Map.open or not Map.inputReady())then return false end
     api.menu(emerald and (state.mapSecName or 'HOENN MAP') or (Map.currentLocationName() or 'TOWN MAP'),rowsFor())
     return true
+  end
+  if rs then
+    api.wrap(require('src.ui.game3.rs.pokenav.map'),'frame',function(previous,state,input)
+      if input.new and input.new.select and not state.zoomFrame and state.moveFrames==0 and navMap()==state then
+        api.menu(state.name or 'HOENN MAP',rowsFor());return
+      end
+      return previous(state,input)
+    end)
   end
   if emerald then
     local R=require("src.ui.game3.rse.region_map")

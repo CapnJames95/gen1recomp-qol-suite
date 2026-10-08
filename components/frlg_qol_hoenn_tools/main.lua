@@ -4,7 +4,7 @@ return function(mod)
  mod.options:define({{key='enabled',label='ENABLED',type='toggle',default=true},
   {key='feebas_reveal',label='REVEAL FEEBAS SPOTS',type='toggle',default=false}})
  local api=Support.new(mod);local baseActive=api.active
- api.active=function()return baseActive() and require('src.core.GameVersion').get()=='emerald'end
+ api.active=function()return baseActive() and require('src.core.game3.profile').active().family=='rse'end
  local req=function(n)return require('src.core.game3.'..n)end
  local s,game;local show,root
  local function name(mon)return mon.nickname and mon.nickname~='' and mon.nickname or req('pokemon').name(mon.species)end
@@ -34,7 +34,7 @@ return function(mod)
    end}
   end
   if #rows==0 then text(rows,'No rematches ready.')end
-  page('MATCH CALL',rows)
+  page(s.version=='emerald' and 'MATCH CALL' or "TRAINER'S EYES",rows)
  end
  local stages={'Planted','Sprouted','Growing','Flowering','Ready to harvest'}
  local function berries()
@@ -94,6 +94,29 @@ return function(mod)
   page('BATTLE '..f.name:upper(),rows,frontier)
  end
  frontier=function()
+  if s.version~='emerald' then
+   local rows={};text(rows,'Native three-Pokemon Singles; Level 50 or Level 100.')
+   for _,r in ipairs(M.tower(s))do text(rows,'Level '..r.level..': '..r.current..' / best '..r.record)end
+   text(rows,'Reception confirms final entry eligibility.')
+   for level=0,1 do local lvl=level
+    rows[#rows+1]={label='Check party trio: Level '..(lvl==0 and '50' or '100'),choose=function()
+     local chosen={};local selectParty
+     selectParty=function()
+      local opts={};for slot,mon in ipairs(s.party or {})do local ix=slot
+       opts[#opts+1]={label=(chosen[ix] and '[X] ' or '[ ] ')..name(mon),choose=function()chosen[ix]=not chosen[ix];selectParty()end}
+      end
+      opts[#opts+1]={label='Check selected trio',choose=function()
+       local slots={};for ix=1,6 do if chosen[ix]then slots[#slots+1]=ix end end
+       local result={};for _,line in ipairs(M.eligibility(s,1,lvl,slots))do text(result,line)end
+       page('ENTRY CHECK',result,selectParty)
+      end}
+      page('CHOOSE THREE',opts,frontier)
+     end
+     selectParty()
+    end}
+   end
+   return page('BATTLE TOWER',rows)
+  end
   local rows={};for i,f in ipairs(M.facilities)do local index=i;rows[#rows+1]={label='Battle '..f.name,choose=function()facility(index)end}end
   page('BATTLE FRONTIER',rows)
  end
@@ -158,7 +181,7 @@ return function(mod)
   text(rows,'Shoal Cave: '..(d.high and 'HIGH tide' or 'LOW tide'))
   text(rows,'Next tide at '..string.format('%02d:00',((d.time.hours or 0)+d.nextHours)%24)..'. Re-enter the cave to apply.')
   text(rows,d.mirage and 'Mirage Island: party qualifies today' or 'Mirage Island: no party match today')
-  text(rows,d.weather);if d.ending then text(rows,'Weather event is ending; check the Institute.')end
+  if d.weather then text(rows,d.weather)end;if d.ending then text(rows,'Weather event is ending; check the Institute.')end
   page('HOENN DAILY EVENTS',rows)
  end
  local bases,registry
@@ -196,8 +219,8 @@ return function(mod)
  root=function(cursor,status)
   if not api.active() or s~=api.session()then return end
   local screen=api.menu('HOENN TOOLS',{
-   {label='Match Call companion',choose=rematches},{label='Berry garden',choose=berries},
-   {label='Battle Frontier',choose=frontier},{label='Feebas assistant',choose=feebas},
+   {label=s.version=='emerald' and 'Match Call companion' or "Trainer's Eyes companion",choose=rematches},{label='Berry garden',choose=berries},
+   {label=s.version=='emerald' and 'Battle Frontier' or 'Battle Tower',choose=frontier},{label='Feebas assistant',choose=feebas},
    {label='Contest / Pokeblock planner',choose=contests},{label='Bike: '..M.bikeName(s)..' (A: switch)',replace=true,choose=function()
     if not api.active() or s~=api.session()then return end
     local ok,why=M.swapBike(s);root(6,not ok and why or nil)

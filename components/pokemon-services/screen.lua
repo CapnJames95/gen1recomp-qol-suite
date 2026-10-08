@@ -2,7 +2,7 @@ return function(Menu,E,A,C,D)
   local Screen={}
   function Screen.show(session)
     if not E.active(session) then return end
-    local emerald=session.version=='emerald'
+    local emerald=require('src.core.game3.profile').forSession(session).family=='rse'
     local ui=Menu.new('pokemon-services',session,function() return E.active(session) end)
     local function info(ok,why)
       if not ok and not require('src.ui.game3.stack').has('pokemon-services') then

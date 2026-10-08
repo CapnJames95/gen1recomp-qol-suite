@@ -32,14 +32,19 @@ return function(mod)
     return rows
   end
   mod.exports.rowsFor = rowsFor
-  api.wrap(Summary, "handleInput", function(previous, input)
-    local mon = (Summary._party or {})[Summary._cursor]
-    if Summary.open and Summary._mode ~= "select_move" and not Summary._enemyParty
-        and not Summary._slide.active and mon and not Pokemon.isEgg(mon)
+  local function handle(previous, input)
+    local S=Summary._nativeDelegate or Summary
+    local mon = (S._party or {})[S._cursor]
+    if S.open and S._mode ~= "select_move" and S._mode~=2 and S._mode~=3 and not S._enemyParty
+        and not (S._opts and S._opts.enemyParty) and not S._fade and not S._pageTask and not S._reload
+        and not (S._slide and S._slide.active) and mon and not Pokemon.isEgg(mon)
         and not require("src.core.game3.battle").isActive() and input:wasPressed("select") then
       api.menu(Pokemon.displayMonName(mon), rowsFor(mon))
       return
     end
     return previous(input)
-  end)
+  end
+  api.wrap(Summary,"handleInput",handle)
+  local version=require('src.core.GameVersion').get()
+  if version=='ruby' or version=='sapphire' then api.wrap(require('src.ui.game3.rs.summary_menu'),'handleInput',handle)end
 end

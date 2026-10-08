@@ -1,19 +1,29 @@
+-- An exchange is not a new acquisition. Keep the marker synchronous and
+-- restore it even if another inventory hook throws.
+local function addExchangedBike(B, bag, id)
+ local previous=B._modBikeExchange
+ B._modBikeExchange=bag
+ local ok,result=pcall(B.add,bag,id,1)
+ B._modBikeExchange=previous
+ if not ok then error(result)end
+ return result
+end
 -- Read models are built on demand, never in the frame loop. No RNG is consumed.
 local M={}
 local function req(n) return require('src.core.game3.'..n) end
 local function copy(t) local o={};for k,v in pairs(t or {})do o[k]=type(v)=='table' and copy(v) or v end;return o end
 M.copy=copy
-local function pretty(s) return tostring(s or 'Unknown'):gsub('^EM_',''):gsub('_',' ') end
+local function pretty(s) return tostring(s or 'Unknown'):gsub('^[A-Z][A-Z]_',''):gsub('_',' ') end
 local function session()return req('runtime').getSession()end
-local function c()return req('constants').of('emerald')end
+local function c()return req('constants').active(session())end
 local function var(name,s)return req('scripting.flags').getVar({vars=s.vars,flags=s.flags},nil,c():require('vars',name))end
 local function flag(name,s)return req('scripting.flags').getFlag({vars=s.vars,flags=s.flags},nil,c():require('flags',name))end
 function M.ready(s)
  local rt=req('runtime');local game=M.game or rt._game;local p=req('player');local sp=req('scripting.space')
- if not s or s~=session() or s.version~='emerald' or not game or game.phase~='field' then return false,'Reopen Hoenn Tools in an Emerald field save.' end
+ if not s or s~=session() or req('profile').forSession(s).family~='rse' or not game or game.phase~='field' then return false,'Reopen Hoenn Tools in a Hoenn field save.' end
  if req('battle').isActive() or req('battle_transition').isActive() or req('field').locked or p.moving or req('warp').isBusy() or require('src.ui.game3.fade').isActive()
    or (sp.vm and sp.vm:isRunning()) or (sp._immediateVm and sp._immediateVm:isRunning()) then return false,'Finish movement, dialogue or battle first.' end
- if (s.frontier and (s.frontier.challengeStatus or 0)~=0) or req('safari').isActive(s) or (game.speedLocked and game:speedLocked()) then return false,'Finish the challenge or linked activity first.' end
+ if ((s.version=='ruby' or s.version=='sapphire') and tostring(req('map').current):find('BATTLE_TOWER',1,true)) or (s.frontier and (s.frontier.challengeStatus or 0)~=0) or req('safari').isActive(s) or (game.speedLocked and game:speedLocked()) then return false,'Finish the challenge or linked activity first.' end
  return true
 end
 local function events()return req('scripting.space').bundle.events end
@@ -21,21 +31,22 @@ local function locations()
  local berries,bases={},{}
  for map,e in pairs(events() or {})do
   for _,o in ipairs(e.objects or {})do
-   if o.berryTreeId and o.movementType==12 then berries[o.berryTreeId]={map=map,x=o.x,y=o.y} end
+   if o.berryTreeId and o.movementType==c():require('movement','MOVEMENT_TYPE_BERRY_TREE_GROWTH') then berries[o.berryTreeId]={map=map,x=o.x,y=o.y} end
   end
   for _,o in ipairs(e.bgEvents or {})do if o.secretBaseId then bases[o.secretBaseId]={map=map,x=o.x,y=o.y}end end
  end
  return berries,bases
 end
 function M.rematches(s)
- local R=req('rse.rematch');local pack=req('scripting.trainers').pack();local rows={}
+ local rs=s.version=='ruby' or s.version=='sapphire'
+ local R=req(rs and 'rs.rematch' or 'rse.rematch');local pack=req('scripting.trainers').pack();local rows={}
  local groups=c():raw('map_groups').byName
- for i=0,R.count()-1 do
-  local e=R.entry(i);local id=e.trainers[1]
+ for i=0,(rs and R.COUNT or R.count())-1 do
+  local e=rs and R.table()[i] or R.entry(i);local id=e.trainers[1]
   -- Native readiness includes the separate Gym Leader path.
-  if id and not R.isForbidden(s,i) and R.isTrainerReadyForRematch(s,id) then
+  if id and (rs or not R.isForbidden(s,i)) and R.isTrainerReadyForRematch(s,id) then
    local map='Unknown location';for name,g in pairs(groups)do if g.group==e.mapGroup and g.num==e.mapNum then map=pretty(name:gsub('^MAP_',''));break end end
-   rows[#rows+1]={name=(pack.trainers[id] or {}).name or ('Trainer '..id),location=map,gym=i>R.SPECIAL_TRAINER_START and i<R.ELITE_FOUR_ENTRIES}
+   rows[#rows+1]={name=(pack.trainers[id] or {}).name or ('Trainer '..id),location=map,gym=not rs and i>R.SPECIAL_TRAINER_START and i<R.ELITE_FOUR_ENTRIES}
   end
  end
  return rows
@@ -83,7 +94,7 @@ function M.berryPatches(s)
  local counts={};for _,p in ipairs(patches)do counts[p.location.map]=(counts[p.location.map]or 0)+1 end
  local ordinal={};for _,p in ipairs(patches)do
   local map=p.location.map;ordinal[map]=(ordinal[map]or 0)+1
-  p.label=(map=='EM_ROUTE130' and 'Mirage Island (Route 130)' or pretty(map))..(counts[map]>1 and (' - patch '..ordinal[map]) or '')
+  p.label=(map:match('_ROUTE130$') and 'Mirage Island (Route 130)' or pretty(map))..(counts[map]>1 and (' - patch '..ordinal[map]) or '')
  end
  return patches
 end
@@ -157,7 +168,22 @@ function M.frontier(s,index)
  end end
  return {name=d.name,rule=d.rule,symbols=U.symbolCount(s,index-1),bp=f.battlePoints or 0,rows=rows,active=(f.challengeStatus or 0)~=0}
 end
+-- Read saved records without native state() normalizing or creating save fields.
+function M.tower(s)
+ local b=s.battleTower or {};local rows={}
+ for i=1,2 do
+  rows[#rows+1]={level=i==1 and 50 or 100,current=(b.currentWinStreaks or {})[i] or 0,
+   record=(b.recordWinStreaks or {})[i] or 0}
+ end
+ return rows
+end
 function M.eligibility(s,index,level,slots)
+ if s.version=='ruby' or s.version=='sapphire' then
+  local code=req('rse.battle_tower_rs').validateParty(s,slots,level)
+  return {({[17]='Select three different eligible party slots: no eggs, banned species or Pokemon above the level limit.',
+   [18]='Selected trio contains duplicate species.',[19]='Selected trio contains duplicate held items.'})[code]
+   or 'Selected trio passes native Battle Tower entry rules.'}
+ end
  local U=req('rse.frontier.util');local P=req('pokemon');local names,items={},{};local issues={}
  if index==5 then return {'Factory uses rentals.'} end
  for _,slot in ipairs(slots or {})do
@@ -200,11 +226,12 @@ function M.daily(s)
  local F=req('scripting.natives_field_rse');local time=req('rtc').calcLocalTime(s);local hour=(time.hours or 0)%24
  local high=F.SHOAL_TIDE[hour]==1;local nextHours=1
  while nextHours<24 and (F.SHOAL_TIDE[(hour+nextHours)%24]==1)==high do nextHours=nextHours+1 end
- local location=var('VAR_ABNORMAL_WEATHER_LOCATION',s)
+ local emerald=s.version=='emerald'
+ local location=emerald and var('VAR_ABNORMAL_WEATHER_LOCATION',s) or 0
  local routes={114,114,115,115,116,116,118,118,105,105,125,125,127,127,129,129}
  return {time=time,high=high,nextHours=nextHours,mirage=F.isMirageIslandPresent(s),
-  weather=routes[location] and ((location>=9 and 'Marine Cave: Route ' or 'Terra Cave: Route ')..routes[location]) or 'No active weather cave',
-  ending=var('VAR_SHOULD_END_ABNORMAL_WEATHER',s)~=0}
+  weather=emerald and (routes[location] and ((location>=9 and 'Marine Cave: Route ' or 'Terra Cave: Route ')..routes[location]) or 'No active weather cave') or nil,
+  ending=emerald and var('VAR_SHOULD_END_ABNORMAL_WEATHER',s)~=0}
 end
 function M.bases(s)
  local _,loc=locations();local out={}
@@ -235,7 +262,7 @@ function M.swapBike(s)
  if riding then local success=U.useBike(s,from);if not success then return false,'Cannot switch bikes here.'end end
  if not (hasM and hasA) then
   assert(B.remove(s.bag,from,1))
-  if not B.add(s.bag,to,1)then assert(B.add(s.bag,from,1));if riding then U.useBike(s,from)end;return false,'No room for the replacement bike.'end
+  if not addExchangedBike(B,s.bag,to)then assert(addExchangedBike(B,s.bag,from));if riding then U.useBike(s,from)end;return false,'No room for the replacement bike.'end
  end
  if s.registeredItem==from then s.registeredItem=to end
  s.modData=s.modData or {};s.modData.hoenn_tools=s.modData.hoenn_tools or {};s.modData.hoenn_tools.bikeChoice=to==mach and 'Mach' or 'Acro'
@@ -245,14 +272,14 @@ end
 -- Exactly the native Feebas spot sequence, using a private seed. No encounter roll.
 function M.feebasSpots(seed)
  local spots={};local n=0
- while n<6 do seed=(1103515245*seed+12345)%4294967296;local id=math.floor(seed/65536)%447;if id==0 then id=447 end
+ while n<6 do seed=(req('rng').mulU32(1103515245,seed)+12345)%4294967296;local id=math.floor(seed/65536)%447;if id==0 then id=447 end
   if id>=4 then n=n+1;spots[id]=true end
  end
  return spots
 end
 function M.feebas(s,reveal)
  local Map=req('map');local P=req('player');local Coll=req('collision')
- if Map.current~='EM_ROUTE119' then return {message='Visit Route 119 and face a fishing tile.'}end
+ if Map.current~=req('profile').forSession(s).map.enginePrefix..'ROUTE119' then return {message='Visit Route 119 and face a fishing tile.'}end
  local delta={up={0,-1},down={0,1},left={-1,0},right={1,0}};local d=delta[P.facing] or delta.down
  local x,y=P.cellX+d[1],P.cellY+d[2];local extra=req('encounters').loadCacheFile('wild_extra.lua')
  local sections=extra.feebas.sections;local section

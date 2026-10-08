@@ -1,7 +1,7 @@
 {
   "id": "frlg-qol-suite",
-  "name": "QoL Suite",
-  "version": "0.3.10",
+  "name": "FRLG QoL Suite",
+  "version": "0.3.11",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -12,7 +12,7 @@
   "permissions": [
     "engine_internals"
   ],
-  "description": "32 QoL components: 31 applicable tools per game, including eight Emerald companions in Hoenn Tools.",
+  "description": "32 configurable QoL components with game-specific support for Ruby, Sapphire, Emerald, FireRed and LeafGreen.",
   "conflicts": [
     "capture-assistant",
     "daycare-viewer",

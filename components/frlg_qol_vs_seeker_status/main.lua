@@ -2,6 +2,25 @@ return function(mod)
   local Support = assert(load(assert(mod:read("support.lua")), "@" .. mod.path .. "/support.lua"))()
   mod.options:define({ { key = "enabled", label = "ENABLED", type = "toggle", default = true } })
   local api = Support.new(mod)
+  local version=require("src.core.GameVersion").get()
+  if version=='ruby' or version=='sapphire' then
+    api.startItem("TRAINER'S EYES",function(game)
+      local tools=mod.find and mod.find("frlg_qol_hoenn_tools")
+      if tools and tools.exports and tools.exports.showRematches then return tools.exports.showRematches(game) end
+      local R=require('src.core.game3.rs.rematch');local session=api.session()
+      local pack=require('src.core.game3.scripting.trainers').pack();local rows={}
+      for i=0,R.COUNT-1 do
+        local e=R.table()[i];local id=e and e.trainers[1]
+        if id and R.isTrainerReadyForRematch(session,id) then
+          rows[#rows+1]={label=tostring((pack.trainers[id] or {}).name or id)..': READY'}
+        end
+      end
+      if #rows==0 then rows[1]={label='No rematches ready'} end
+      rows[#rows+1]={label="Open PokeNav for trainer locations"}
+      api.menu("TRAINER'S EYES",rows)
+    end)
+    return
+  end
   if require("src.core.GameVersion").get() == "emerald" then
     api.startItem("MATCH CALL REMATCHES", function(game)
       local tools=mod.find and mod.find("frlg_qol_hoenn_tools")

@@ -23,18 +23,18 @@ return function(mod, active)
   local function enabled()
     local session = Runtime.getSession()
     return active() and mod.options:get('inspect') ~= false and session
-      and (session.version == 'firered' or session.version == 'leafgreen' or session.version == 'emerald')
+      and (session.version == 'firered' or session.version == 'leafgreen' or session.version == 'emerald' or session.version == 'ruby' or session.version == 'sapphire')
   end
   local function valid()
     return inspected and enabled() and Runtime.getSession() == inspected.session
       and Battle.isActive() and Battle._st == inspected.state and Ui._st == inspected.state
       and Ui._st.enemy and Ui._st.enemy.mon == inspected.original
-      and Summary.open and Summary._party == inspected.party and Stack.has('summary')
+      and Summary.open and (Summary._nativeDelegate or Summary)._party == inspected.party and Stack.has('summary')
   end
   local function close()
     local previous = inspected
     inspected = nil
-    if previous and Summary._party == previous.party and Summary.open then Summary.close() end
+    if previous and (Summary._nativeDelegate or Summary)._party == previous.party and Summary.open then Summary.close() end
   end
   local function ready()
     local state = Ui._st
@@ -122,7 +122,7 @@ return function(mod, active)
     Summary.update(dt)
     local input = game and game.input
     if input then
-      if input:wasPressed('select') and not Summary._slide.active then
+      if input:wasPressed('select') and not (Summary._slide and Summary._slide.active) and not (Summary._nativeDelegate and (Summary._nativeDelegate._pageTask or Summary._nativeDelegate._fade or Summary._nativeDelegate._reload)) then
         inspected.evs = not inspected.evs
       else
         Summary.handleInput(input)

@@ -6,11 +6,12 @@ return function(mod)
   function E.active(session)
     local s=Runtime.getSession()
     return owner==Mods.events and mod.options:get('enabled')~=false and s~=nil
-      and (not session or s==session) and (s.version=='firered' or s.version=='leafgreen' or s.version=='emerald')
+      and (not session or s==session) and (s.version=='firered' or s.version=='leafgreen' or s.version=='emerald' or s.version=='ruby' or s.version=='sapphire')
   end
   function E.ready(session)
     session=session or Runtime.getSession()
-    if not E.active(session) then return false,'Load an active FireRed, LeafGreen or Emerald game.' end
+    if not E.active(session) then return false,'Load an active Gen 3 game.' end
+    if session and (session.version=='ruby' or session.version=='sapphire') and tostring(require('src.core.game3.map').current):find('BATTLE_TOWER',1,true) then return false,'Leave the Battle Tower first.' end
     if session and session.version=='emerald' and session.frontier and (session.frontier.challengeStatus or 0)~=0 then return false,'Finish the Battle Frontier challenge first.' end
     local game=E.game or Runtime._game
     if not game or game.phase~='field' then return false,'Return to the field first.' end

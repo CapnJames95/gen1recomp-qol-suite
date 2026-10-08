@@ -62,21 +62,21 @@ return function(E,C)
       -- Native party chooser, eligibility queries and learning UI, without the
       -- retail merchant's mushroom checks, payment dialogue or item removal.
       local S=require('src.core.game3.scripting.stdscripts').SPECIAL
-      if session.version=='emerald' then S=require('src.core.game3.constants').of('emerald').specials.byName end
+      if require('src.core.game3.profile').forSession(session).family=='rse' then S=require('src.core.game3.constants').of(session.version).specials.byName end
       key='pokemon-services:free-reminder'
       local finish=key..':end'
       Space.vm.scripts[finish]={{op='release'},{op='end'}}
       Space.vm.scripts[key]={
         {op='lock'},
-        {op='special',id=S.ChooseMonForMoveRelearner},{op='waitstate'},
+        {op='special',id=S.ChooseMonForMoveRelearner or S.SelectMoveTutorMon},{op='waitstate'},
         {op='compare_var_to_value',var=0x8004,value=6},
         {op='goto_if',cond=4,target=finish},
-        {op='special',id=session.version=='emerald' and S.IsSelectedMonEgg or 328}, -- Native IsSelectedMonEgg query.
+        {op='special',id=S.IsSelectedMonEgg or 328}, -- Native IsSelectedMonEgg query.
         {op='compare_var_to_value',var=0x800D,value=1},
         {op='goto_if',cond=1,target=finish},
         {op='compare_var_to_value',var=0x8005,value=0},
         {op='goto_if',cond=1,target=finish},
-        {op='special',id=S.TeachMoveRelearnerMove},{op='waitstate'},
+        {op='special',id=S.TeachMoveRelearnerMove or S.DisplayMoveTutorMenu},{op='waitstate'},
         {op='release'},{op='end'},
       }
     end

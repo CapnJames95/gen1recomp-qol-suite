@@ -6,13 +6,13 @@ return function(mod)
   local Bag = require("src.core.game3.bag")
   Shop._frlgQolOwnedCount = function(id)
     local session = Shop._session
-    if api.active() and session and session.bag and id then return Bag.get(session.bag, id) end
+    if api.active() and session and session.bag and id and (not Shop._martType or Shop._martType=='NORMAL') then return Bag.get(session.bag, id) end
   end
   api.wrap(Shop, "draw", function(previous, ...)
     local result = previous(...)
     local session=Shop._session
-    local emerald=session and session.version=='emerald'
-    if Shop.open and (emerald and Shop.state=='list' or not emerald and Shop.mode=='buy') and not Shop._fading then
+    local emerald=session and require("src.core.game3.profile").forSession(session).family=="rse"
+    if Shop.open and (not Shop._martType or Shop._martType=='NORMAL') and (emerald and Shop.state=='list' or not emerald and Shop.mode=='buy') and not Shop._fading then
       local index=emerald and ((Shop.scroll or 0)+(Shop.row or 0)+1) or Shop.cursor
       local raw = (Shop._items or {})[index]
       local id = type(raw) == "table" and (raw.id or raw.itemId or raw.item) or raw

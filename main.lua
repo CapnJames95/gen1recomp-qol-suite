@@ -15,9 +15,9 @@ return function(mod)
     return component.get(component.api.options, key)
   end
   local function suppressed(id)
-    local emerald=require('src.core.GameVersion').get()=='emerald'
-    if emerald and id=='disable-lr-help' then return true end
-    if not emerald and id=='frlg_qol_hoenn_tools' then return true end
+    local hoenn=require('src.core.game3.profile').active().family=='rse'
+    if hoenn and id=='disable-lr-help' then return true end
+    if not hoenn and id=='frlg_qol_hoenn_tools' then return true end
     return id=='frlg_qol_ball_shortcut' and loader and loader.mods.frlg_dual_screen~=nil
   end
   function mod.exports.hidden(id) return suppressed(id) and true or false end
@@ -35,7 +35,7 @@ return function(mod)
     for _, definition in ipairs(definitions) do
       local component = components[definition.id]
       if not suppressed(definition.id) then
-      rows[#rows+1] = {id=definition.id, key='enabled', label=(definition.id=='frlg_qol_vs_seeker_status' and require('src.core.GameVersion').get()=='emerald') and 'Match Call Rematch Status' or definition.name,
+      rows[#rows+1] = {id=definition.id, key='enabled', label=(definition.id=='frlg_qol_vs_seeker_status' and require('src.core.GameVersion').get()=='emerald') and 'Match Call Rematch Status' or ((definition.id=='frlg_qol_vs_seeker_status' and (require('src.core.GameVersion').get()=='ruby' or require('src.core.GameVersion').get()=='sapphire')) and "Trainer's Eyes Rematch Status" or definition.name),
         value=component and component.ready and rawValue(component, 'enabled') ~= false or false,
         error=component and component.error, ready=component and component.ready or false}
       end

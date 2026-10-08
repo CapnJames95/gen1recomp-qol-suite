@@ -1,3 +1,7 @@
+local function collectionSmall()
+ local v=require('src.core.GameVersion').get()
+ return v~='ruby' and v~='sapphire'
+end
 return function(mod, active, Layout)
   local Menu=require('src.ui.game3.start_menu')
   local Stack=require('src.ui.game3.stack')
@@ -11,12 +15,12 @@ return function(mod, active, Layout)
   local rebuild, home, folderActions, orderPage, destinations
   local function text(label,x,y,width,small)
     label=tostring(label or '')
-    if Font.measure(label,{small=small})>width then
+    if Font.measure(label,{small=collectionSmall() and small})>width then
       local chars=Font.countChars(label)
-      repeat chars=chars-1;label=Font.truncate(label,chars) until chars<=0 or Font.measure(label..'...',{small=small})<=width
+      repeat chars=chars-1;label=Font.truncate(label,chars) until chars<=0 or Font.measure(label..'...',{small=collectionSmall() and small})<=width
       label=label..'...'
     end
-    Window.printPx(label,x,y,{maxWidth=width,small=small})
+    Window.printPx(label,x,y,{maxWidth=width,small=collectionSmall() and small})
   end
   local function page(title,rows,move)
     pages[#pages+1]={title=title,rows=rows,index=1,move=move}

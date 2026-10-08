@@ -9,12 +9,12 @@ return function(View)
       ui.closed = true
     end
     function ui.push(title, rows)
-      if session.version=='emerald' then
+      if require('src.core.game3.profile').forSession(session).family=='rse' then
         title=title:gsub('FOUR ISLAND','ROUTE 117')
         local filtered={}
         for _,row in ipairs(rows) do
           if not tostring(row.label):find('Route 5') and not tostring(row.label):find('ROUTE 5') then
-            row.label=tostring(row.label):gsub('Four Island','Route 117'):gsub('FOUR ISLAND','ROUTE 117'):gsub('FR/LG has no Everstone nature or shiny%-parent bonus%.','Emerald supports Everstone nature inheritance.'):gsub('Celadon','Lilycove')
+            row.label=tostring(row.label):gsub('Four Island','Route 117'):gsub('FOUR ISLAND','ROUTE 117'):gsub('FR/LG has no Everstone nature or shiny%-parent bonus%.',session.version=='emerald' and 'Emerald supports Everstone nature inheritance.' or 'Ruby/Sapphire have no Everstone nature inheritance.'):gsub('Celadon','Lilycove')
             filtered[#filtered+1]=row
           end
         end

@@ -1,3 +1,9 @@
+-- RS native small-font atlases do not render reliably in these compact mod menus.
+-- Keep measurement and drawing on the same readable native face.
+local function collectionFont()
+ local v=require('src.core.GameVersion').get()
+ return (v=='ruby' or v=='sapphire') and 'normal' or nil
+end
 local Runtime = require("src.mods.Runtime")
 local GameVersion = require("src.core.GameVersion")
 local Support = {}
@@ -7,7 +13,7 @@ function Support.new(mod)
   local api = {}
   function api.active()
     local version = GameVersion.get()
-    return Runtime.events == owner and (version == "firered" or version == "leafgreen" or version == "emerald")
+    return Runtime.events == owner and (version == "firered" or version == "leafgreen" or version == "emerald" or version == "ruby" or version == "sapphire")
       and mod.options:get("enabled") ~= false
   end
   function api.wrap(target, name, handler)
@@ -43,14 +49,14 @@ function Support.new(mod)
   function api.text(value, x, y, width, small, colors)
     local Font = require("src.ui.game3.frlg_font")
     value = tostring(value or "")
-    if Font.measure(value, { small = small }) > width then
-      while #value > 0 and Font.measure(value .. "...", { small = small }) > width do
+    if Font.measure(value, {small=collectionFont()==nil and small }) > width then
+      while #value > 0 and Font.measure(value .. "...", {small=collectionFont()==nil and small }) > width do
         value = value:sub(1, -2)
       end
       value = value .. "..."
     end
     require("src.ui.game3.window").printPx(value, x, y,
-      { maxWidth = width, small = small, colors = colors })
+      { maxWidth = width,small=collectionFont()==nil and small, colors = colors })
   end
   function api.frame(x, y, width, height)
     local Window = require("src.ui.game3.window")
@@ -68,7 +74,7 @@ function Support.new(mod)
     love.graphics.rectangle("fill", 0, 0, 240, 16)
     love.graphics.setColor(1, 1, 1, 1)
     api.text(title, 8, 0, 174, false, Font.COLOR.WHITE)
-    api.text(marker or (GameVersion.get() == "emerald" and "EM" or GameVersion.get() == "leafgreen" and "LG" or "FR"),
+    api.text(marker or (({firered="FR",leafgreen="LG",emerald="EM",ruby="RU",sapphire="SA"})[GameVersion.get()] or "G3"),
       202, 0, 30, true, Font.COLOR.WHITE)
     api.frame(1, 17, 28, 2)
     api.text(help or "A: choose  B: back  Left/Right: page", 12, 136, 216, true)
@@ -163,7 +169,7 @@ function Support.new(mod)
     local lines, line = {}, ""
     for word in tostring(value or ""):gmatch("%S+") do
       local trial = line == "" and word or line .. " " .. word
-      if line ~= "" and Font.measure(trial, { small = true }) > (width or 208) then
+      if line ~= "" and Font.measure(trial, {small=collectionFont()==nil and true }) > (width or 208) then
         lines[#lines + 1], line = line, word
       else line = trial end
     end

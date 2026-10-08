@@ -6,12 +6,12 @@ return function(Model, View, services)
     Screen.active=screen
     local snapshot=Model.snapshot(session)
     local function push(title,rows,mon)
-      if session.version=='emerald' then
+      if require('src.core.game3.profile').forSession(session).family=='rse' then
         title=title:gsub('FOUR ISLAND','ROUTE 117')
         local filtered={}
         for _,row in ipairs(rows) do
           if not tostring(row.label):find('Route 5') and not tostring(row.label):find('ROUTE 5') then
-            row.label=tostring(row.label):gsub('Four Island','Route 117'):gsub('FOUR ISLAND','ROUTE 117'):gsub('FR/LG has no Everstone nature or shiny%-parent bonus%.','Emerald supports Everstone nature inheritance.'):gsub('Celadon','Lilycove')
+            row.label=tostring(row.label):gsub('Four Island','Route 117'):gsub('FOUR ISLAND','ROUTE 117'):gsub('FR/LG has no Everstone nature or shiny%-parent bonus%.',session.version=='emerald' and 'Emerald supports Everstone nature inheritance.' or 'Ruby/Sapphire have no Everstone nature or shiny-parent bonus.'):gsub('Celadon','Lilycove')
             filtered[#filtered+1]=row
           end
         end
@@ -25,10 +25,10 @@ return function(Model, View, services)
     local function info(title,lines)
       local rows={}
       for _,line in ipairs(lines) do
-        if session.version=='emerald' then
+        if require('src.core.game3.profile').forSession(session).family=='rse' then
           local text={
-            ['Pending egg IVs, nature and shininess are generated on collection.']='A pending egg already has its PID, nature and shininess. IVs are generated on collection.',
-            ['FR/LG has no Everstone nature or shiny-parent bonus.']='Emerald supports Everstone nature inheritance and Light Ball Volt Tackle. Shiny parents give no shiny bonus.',
+            ['Pending egg IVs, nature and shininess are generated on collection.']=session.version=='emerald' and 'A pending egg already has its PID, nature and shininess. IVs are generated on collection.' or 'A pending egg stores part of its PID. Final nature, shininess and IVs are generated on collection.',
+            ['FR/LG has no Everstone nature or shiny-parent bonus.']=session.version=='emerald' and 'Emerald supports Everstone nature inheritance and Light Ball Volt Tackle. Shiny parents give no shiny bonus.' or 'Ruby/Sapphire have no Everstone nature inheritance, Light Ball Volt Tackle or shiny-parent bonus.',
             ['Route 5 trains one Pokemon. Four Island trains two and can produce eggs.']='Route 117 trains two Pokemon and can produce eggs.',
             ['Manage / teleport: change deposited Pokemon remotely or travel to either Day Care. Collect eggs in person.']='Manage parents remotely or teleport to Route 117. Collect eggs in person.',
             ['Native FR/LG menus pause walking. This is your real Day Care, not Auto Breeder virtual parents.']='Menus pause walking. This is your real Day Care, separate from Auto Breeder virtual parents.',

@@ -3,7 +3,8 @@ return function(mod)
   mod.options:define({ { key = "enabled", label = "ENABLED", type = "toggle", default = true } })
   local api = Support.new(mod)
   local Party = require("src.ui.game3.party_menu")
-  local Relearner = require(require("src.core.GameVersion").get()=="emerald" and "src.ui.game3.rse.move_relearner" or "src.ui.game3.move_relearner")
+  local version=require("src.core.GameVersion").get()
+  local Relearner = require((version=="ruby" or version=="sapphire") and "src.ui.game3.rs.move_relearner" or require("src.core.game3.profile").active().family=="rse" and "src.ui.game3.rse.move_relearner" or "src.ui.game3.move_relearner")
   local Bag = require("src.core.game3.bag")
   local Items = require("src.core.game3.items_data")
   api.wrap(Party, "handleInput", function(previous, input)
@@ -12,12 +13,12 @@ return function(mod)
       local big = Items.toNumericId("BIG MUSHROOM")
       local tiny = Items.toNumericId("TINY MUSHROOM")
       local payment, count
-      if session.version == "emerald" then
+      if require("src.core.game3.profile").forSession(session).family == "rse" then
         local heart = Items.toNumericId("HEART SCALE")
         if heart and Bag.get(session.bag, heart) >= 1 then payment, count = heart, 1 end
       elseif tiny and Bag.get(session.bag, tiny) >= 2 then payment, count = tiny, 2
       elseif big and Bag.get(session.bag, big) >= 1 then payment, count = big, 1 end
-      if not payment then api.notice(session.version == "emerald" and "Need 1 Heart Scale" or "Need 2 Tiny or 1 Big Mushroom") return end
+      if not payment then api.notice(require("src.core.game3.profile").forSession(session).family == "rse" and "Need 1 Heart Scale" or "Need 2 Tiny or 1 Big Mushroom") return end
       local charged = false
       Relearner.show(session.party[Party.cursor], { session = session, onDone = function(learned)
         if learned and not charged then

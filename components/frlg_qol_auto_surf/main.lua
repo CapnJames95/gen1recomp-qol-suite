@@ -16,7 +16,7 @@ return function(mod)
       and api.session() and not Player.biking and {} or nil
     local ok, result = pcall(previous, game)
     if ok and not result and interaction and Player.underwater
-        and require("src.core.GameVersion").get()=="emerald" then
+        and require("src.core.game3.profile").active().family=="rse" then
       ok,result=pcall(require("src.core.game3.dive").tryEmerge)
     end
     interaction = saved
@@ -24,18 +24,23 @@ return function(mod)
     return result
   end)
 
-  if require("src.core.GameVersion").get() == "emerald" then
+  if require("src.core.game3.profile").active().family == "rse" then
     local Space=require("src.core.game3.scripting.space")
     local Actions=assert(load(mod:read("field_actions.lua")))()
     local labels={EventScript_CutTree="CUT",EventScript_RockSmash="ROCK_SMASH",
       EventScript_StrengthBoulder="STRENGTH",EventScript_UseSurf="SURF",
       EventScript_UseWaterfall="WATERFALL",EventScript_UseDive="DIVE",EventScript_UseDiveUnderwater="DIVE"}
+    if require('src.core.GameVersion').get()=='ruby' or require('src.core.GameVersion').get()=='sapphire' then
+      labels.S_CuttableTree='CUT';labels.S_BreakableRock='ROCK_SMASH';labels.S_PushableBoulder='STRENGTH'
+      labels.S_UseDiveUnderwater='DIVE'
+    end
     api.wrap(Space,"startScript",function(previous,key,...)
       local game=Field._game or require("src.core.game3.runtime")._game
       local input=game and game.input
       if (interaction or (input and input:wasPressed("a"))) and not Field.locked and not Player.moving then
         for label,move in pairs(labels) do
-          if key==Space.scriptKey(label) then
+          local nativeKey=Space.scriptKey(label)
+          if nativeKey and key==nativeKey then
             local ctx=Actions.context(api.session())
             local mon,slot
             if ctx then mon,slot=FieldMoves.partyMoveUser(ctx.party,move) end
@@ -43,7 +48,7 @@ return function(mod)
               ctx.mon=mon
               local result=FieldMoves.fromMenu(move,ctx)
               if result and result.ok then
-                -- Keep Emerald's native script, field effects, encounter rolls,
+                -- Keep the edition's native script, field effects, encounter rolls,
                 -- object flags and usage counters. Only skip successful prompts.
                 local source=Space.vm and Space.vm.scripts[key]
                 local rewritten,confirmed={},false

@@ -4,7 +4,7 @@ return function(mod)
   local api = Support.new(mod)
   local Player = require("src.core.game3.player")
   api.wrap(Player, "canDash", function()
-    if require("src.core.GameVersion").get() == "emerald" then
+    if require("src.core.game3.profile").active().family == "rse" then
       return not Player.underwater and not Player.runningDisallowed(Player.cellX, Player.cellY)
     end
     return true

@@ -6,7 +6,7 @@ return function(mod)
   function E.active(session)
     local s=Runtime.getSession()
     return owner==Mods.events and mod.options:get('enabled')~=false and s~=nil
-      and (not session or s==session) and (s.version=='firered' or s.version=='leafgreen' or s.version=='emerald')
+      and (not session or s==session) and (s.version=='firered' or s.version=='leafgreen' or s.version=='emerald' or s.version=='ruby' or s.version=='sapphire')
   end
   function E.ready(session)
     if not E.active(session) then return false,'Load an active FireRed, LeafGreen or Emerald game.' end

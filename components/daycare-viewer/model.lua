@@ -26,6 +26,14 @@ local function moves(mon)
   end
   return out
 end
+local function nature(mon)
+  local version=require('src.core.GameVersion').get()
+  if version=='ruby' or version=='sapphire' then
+    local Text=require('src.core.game3.rom_text')
+    return Text.plain(Text.key('gNatureNames',P.natureId(mon.personality or 0)))
+  end
+  return select(2,S.nature(mon))
+end
 function M.mon(mon, steps, mail)
   if not valid(mon) then return nil end
   mon = M.copy(mon); steps = tonumber(steps) or 0
@@ -53,7 +61,7 @@ function M.mon(mon, steps, mail)
     level=level, before=E.levelForExp(growth,exp), gained=D.levelsGained(mon,steps),
     steps=steps, cost=D.cost(mon,steps), exp=math.min(exp+steps,E.expForLevel(growth,100)),
     nextLevel=level<100 and math.max(0,E.expForLevel(growth,level+1)-exp-steps) or nil,
-    nature=select(2,S.nature(mon)), gender=P.gender(D.speciesOf(mon),mon.personality),
+    nature=nature(mon), gender=P.gender(D.speciesOf(mon),mon.personality),
     shiny=P.isShiny(mon), ability=P.abilityName(mon.ability or P.abilityId(D.speciesOf(mon),mon.personality)),
     item=(item==0 or item=='NONE') and 'None' or I.displayName(item),
     groups=table.concat(names,' / '), mail=mail~=nil, moves=moves(mon), afterMoves=moves(preview)}

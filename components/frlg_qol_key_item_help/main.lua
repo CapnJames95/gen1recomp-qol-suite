@@ -27,7 +27,7 @@ return function(mod)
     [350] = "POKE FLUTE: use beside a sleeping Snorlax. In battle it wakes sleeping Pokemon.",
     [359] = "SILPH SCOPE: identifies ghosts automatically when the story requires it.",
   }
-  if require("src.core.GameVersion").get()=="emerald" then
+  if require("src.core.game3.profile").active().family=="rse" then
     notes,bagNotes={},{}
     local descriptions={
       MACH_BIKE="MACH BIKE: Build speed for cracked floors and muddy slopes.",
@@ -40,6 +40,11 @@ return function(mod)
       AURORA_TICKET="AURORA TICKET: Birth Island access via Lilycove harbor.",
       MYSTIC_TICKET="MYSTIC TICKET: Navel Rock access via Lilycove harbor.",
     }
+    local version=require('src.core.GameVersion').get()
+    if version=='ruby' or version=='sapphire' then
+      descriptions.WAILMER_PAIL='WAILMER PAIL: Water planted berries.'
+      descriptions.AURORA_TICKET=nil;descriptions.MYSTIC_TICKET=nil
+    end
     for name,text in pairs(descriptions) do
       local id=Items.toNumericId(name)
       if id then notes[id],bagNotes[id]=text,text end
@@ -54,7 +59,7 @@ return function(mod)
   end)
   api.wrap(Bag, "add", function(previous, bag, id, quantity)
     local session, numeric = api.session(), Items.toNumericId(id)
-    local first = session and session.bag == bag and notes[numeric] and Bag.get(bag, numeric) == 0
+    local first = Bag._modBikeExchange ~= bag and session and session.bag == bag and notes[numeric] and Bag.get(bag, numeric) == 0
     local ok, added = previous(bag, id, quantity)
     if first and ok and mod.options:get("popup") and Bag.get(bag, numeric) > 0 then
       pending[#pending + 1] = { session = session, item = numeric }

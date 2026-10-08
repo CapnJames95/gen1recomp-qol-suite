@@ -13,7 +13,7 @@ return function(Travel)
   local function query(name,ctx) local _,value=Queries[name](ctx);return value end
   local function ready(session,site)
     if Runtime.getSession()~=session then return false,'The playthrough changed. Reopen SERVICES.' end
-    if session.version=='emerald' and site~='four' then return false,'Emerald has one Day Care, on Route 117.' end
+    if require('src.core.game3.profile').forSession(session).family=='rse' and site~='four' then return false,'Hoenn has one Day Care, on Route 117.' end
     if site~='route5' and site~='four' then return false,'Unknown Day Care.' end
     return Travel.ready()
   end
@@ -39,7 +39,7 @@ return function(Travel)
     local mon=session.party and session.party[slot]
     if not mon or mon~=expected or D.speciesOf(mon)==0 then return false,'Party changed. Choose the Pokemon again.' end
     if P.isEgg(mon) or mon.isBadEgg then return false,'Eggs cannot be deposited.' end
-    if pending(session,site) then return false,session.version=='emerald' and 'Collect the waiting egg at Route 117 first.' or 'Collect the waiting egg at Four Island first.' end
+    if pending(session,site) then return false,require('src.core.game3.profile').forSession(session).family=='rse' and 'Collect the waiting egg at Route 117 first.' or 'Collect the waiting egg at Four Island first.' end
     local dc=state(session,site)
     if (site=='four' and not D.findEmptySpot(dc)) or (site=='route5' and dc.mon) then return false,'This Day Care is full. Withdraw a Pokemon first.' end
     local ctx=context(slot)
@@ -57,7 +57,7 @@ return function(Travel)
     if not quote or not expected or quote.mon~=expected.mon or quote.cost~=expected.cost or quote.steps~=expected.steps then
       return false,'Day Care changed. Review the Pokemon and fee again.'
     end
-    if pending(session,site) then return false,session.version=='emerald' and 'Collect the waiting egg at Route 117 first.' or 'Collect the waiting egg at Four Island first.' end
+    if pending(session,site) then return false,require('src.core.game3.profile').forSession(session).family=='rse' and 'Collect the waiting egg at Route 117 first.' or 'Collect the waiting egg at Four Island first.' end
     local ctx=context(slot,quote.cost)
     if query('CalculatePlayerPartyCount',ctx)>=6 then return false,'Your party is full. Make room before withdrawing.' end
     if query('IsEnoughForCostInVar0x8005',ctx)~=1 then return false,'Not enough money. The fee is $'..quote.cost..'.' end
