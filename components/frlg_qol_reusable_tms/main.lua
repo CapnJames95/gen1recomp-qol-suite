@@ -24,6 +24,15 @@ return function(mod)
     copied.onDone = function(...) return scoped(options.onDone, ...) end
     return previous(copied)
   end)
+  -- The native Bag -> party menu teaches directly instead of calling useTm.
+  -- Scope both immediate removal and the delayed replacement callback.
+  local PartyMenu = require("src.ui.game3.party_menu")
+  api.wrap(PartyMenu, "handleInput", function(previous, ...)
+    if PartyMenu.mode == "use" and Items.isTm(PartyMenu._item) then
+      return scoped(previous, ...)
+    end
+    return previous(...)
+  end)
   api.wrap(ItemUse, "useTm", function(previous, ...)
     return scoped(previous, ...)
   end)

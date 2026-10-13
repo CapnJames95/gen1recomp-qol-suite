@@ -1,7 +1,7 @@
 {
   "id": "frlg-qol-suite",
   "name": "QoL Suite",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "api": 2,
   "entry": "main.lua",
   "games": [

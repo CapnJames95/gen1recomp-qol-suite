@@ -22,7 +22,7 @@ return {
   {id="frlg_qol_quick_save_prompt", name="Quicker Save Confirmation", version="0.1.1", entry="main.lua"},
   {id="frlg_qol_quiet_exp", name="Quiet EXP", version="0.1.0", entry="main.lua"},
   {id="frlg_qol_repel_reuse", name="Repel Reuse Prompt", version="0.1.1", entry="main.lua"},
-  {id="frlg_qol_reusable_tms", name="Reusable TMs", version="0.1.1", entry="main.lua"},
+  {id="frlg_qol_reusable_tms", name="Reusable TMs", version="0.1.2", entry="main.lua"},
   {id="frlg_qol_running_start", name="Running From Start", version="0.1.1", entry="main.lua"},
   {id="frlg_qol_safari_tools", name="Safari Zone Tools", version="0.1.0", entry="main.lua"},
   {id="frlg_qol_shop_count", name="Shop Owned Count", version="0.2.0", entry="main.lua"},
