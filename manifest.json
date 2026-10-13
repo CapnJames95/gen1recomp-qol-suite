@@ -1,7 +1,7 @@
 {
   "id": "frlg-qol-suite",
-  "name": "FRLG QoL Suite",
-  "version": "0.3.11",
+  "name": "QoL Suite",
+  "version": "0.3.13",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -12,7 +12,7 @@
   "permissions": [
     "engine_internals"
   ],
-  "description": "32 configurable QoL components with game-specific support for Ruby, Sapphire, Emerald, FireRed and LeafGreen.",
+  "description": "35 configurable QoL components, including Safari Zone Tools and expanded Teleport, across all five Gen 3 games.",
   "conflicts": [
     "capture-assistant",
     "daycare-viewer",
@@ -45,7 +45,10 @@
     "frlg_scrollable_start",
     "pokemon-services",
     "quick-heal-party",
-    "summary-ivs"
+    "summary-ivs",
+    "frlg_qol_safari_tools",
+    "frlg_qol_zoom_controls",
+    "frlg_qol_walk_through_walls"
   ],
   "game_version": ">=0.3.39 <0.4.0",
   "github": "CapnJames95/gen1recomp-qol-suite"
