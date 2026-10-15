@@ -29,12 +29,27 @@ return function(mod)
       Steps.queueEvent({ run = function(onDone)
         local id = candidate(session)
         if not id or not api.active() then onDone() return end
-        api.menu("Use " .. Items.displayName(id) .. "?", {
-          { label = "NO", choose = function() end },
-          { label = "YES", choose = function()
-            if Bag.get(session.bag, id) > 0 then Use.useField(session, session.bag, id) end
-          end },
-        }, onDone)
+        local screen, completed
+        local function done()
+          if completed then return end
+          completed = true
+          onDone()
+        end
+        local function answer(reuse)
+          -- api.choose removes the menu layer without calling screen.close.
+          -- Complete the native step event explicitly, just as B/back does.
+          local ok, err = pcall(function()
+            if reuse and api.active() and Bag.get(session.bag, id) > 0 then
+              Use.useField(session, session.bag, id)
+            end
+          end)
+          screen.close()
+          if not ok then error(err, 0) end
+        end
+        screen = api.menu("Use " .. Items.displayName(id) .. "?", {
+          { label = "NO", choose = function() answer(false) end },
+          { label = "YES", choose = function() answer(true) end },
+        }, done)
       end })
     end
   end)
