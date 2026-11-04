@@ -1,7 +1,7 @@
 {
   "id": "frlg-qol-suite",
   "name": "QoL Suite",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "api": 2,
   "entry": "main.lua",
   "games": [
@@ -50,6 +50,6 @@
     "frlg_qol_zoom_controls",
     "frlg_qol_walk_through_walls"
   ],
-  "game_version": ">=0.3.39 <0.4.0",
+  "game_version": ">=0.3.39 <10.0.0",
   "github": "CapnJames95/gen1recomp-qol-suite"
 }
